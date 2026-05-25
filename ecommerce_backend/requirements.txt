@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+psycopg2
+bcrypt
+jwt
+python-jose
+python-dotenv
+pydantic[email]
