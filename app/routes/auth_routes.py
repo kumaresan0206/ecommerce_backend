@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.schemas.user_schema import UserLogin, UserRegister
 from app.services.auth_service import register_user, login_user
 from app.utils.jwt_handler import decode_access_token
 from app.database import get_db
+from app.middleware.auth_middleware import oauth2_scheme
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 auth_router = APIRouter()
 
 @auth_router.post("/auth/register")
@@ -21,7 +21,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     payload = decode_access_token(token)
 
     if not payload or not payload.get("sub") or not payload.get("role"):
-        return {"success": False, "message": "Invalid token"}
+        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     
     email = payload.get("sub")
     role = payload.get("role")

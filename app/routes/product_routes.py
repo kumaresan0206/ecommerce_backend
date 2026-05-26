@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from app.schemas.product_schema import Product, ProductUpdate
 from app.services.product_service import get_products, get_product, create_product, update_product, update_full_product_info, delete_product_by_id
 from app.database import get_db
-from app.utils.utilis import get_admin
+from app.middleware.auth_middleware import get_admin
 
 product_router = APIRouter()
 

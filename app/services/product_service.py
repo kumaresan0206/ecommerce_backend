@@ -1,3 +1,5 @@
+from fastapi import HTTPException, status
+from app.utils.logger import logger
 from app.repositories.product_repository import (add_product, 
                                             get_all_products, 
                                             get_product_by_id, 
@@ -12,24 +14,27 @@ def create_product(product, db):
         add_product(product.name, product.description, product.price, product.stock, db)
         return {"success": True, "message": "Product added successfully"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
-    
+        logger.error(f"Error occurred while adding product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while adding product")
+
 def get_products(db, limit, offset):
     try:
         products = get_all_products(db, limit, offset)
         return {"success": True, "products": products}
     except Exception as e:
-        return {"success": False, "message": str(e)}
-    
+        logger.error(f"Error occurred while fetching products: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while fetching products")
+
 def get_product(product_id, db):
     try:
         product = get_product_by_id(product_id, db)
         if product:
             return {"success": True, "product": product}
         else:
-            return {"success": False, "message": "Product not found"}
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        logger.error(f"Error occurred while fetching product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while fetching product")
     
 def update_product(product_id, product, db):
     try:
@@ -37,7 +42,7 @@ def update_product(product_id, product, db):
             # Get the current product details
             current_product = get_product_by_id(product_id, db)
             if not current_product:
-                return {"success": False, "message": "Product not found"}
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
 
             # Update the product details
             if product.price is not None:
@@ -46,19 +51,22 @@ def update_product(product_id, product, db):
                 update_product_stock(product_id, product.stock, db)
         return {"success": True, "message": "Product updated successfully"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
-    
+        logger.error(f"Error occurred while updating product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while updating product")
+
 def update_full_product_info(product_id, product, db):
     try:
         update_full_product(product_id, product.name, product.description, product.price, product.stock, db)
         return {"success": True, "message": "Product updated successfully"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
-    
+        logger.error(f"Error occurred while updating full product info: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while updating full product info")
+
 def delete_product_by_id(product_id, db):
     try:
         delete_product(product_id, db)
         return {"success": True, "message": "Product deleted successfully"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        logger.error(f"Error occurred while deleting product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while deleting product")
     

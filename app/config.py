@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 class Settings(BaseSettings):
 
@@ -6,8 +7,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    ROUNDS: int
 
-    class Config:
-        env_file = "C:/Users/KumaresanK/projects/ecommerce/ecommerce_backend/app/.env"
+    model_config = ConfigDict(env_file="app/.env", extra="ignore")
 
 settings = Settings()

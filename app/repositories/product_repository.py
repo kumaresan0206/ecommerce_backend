@@ -1,4 +1,7 @@
 from psycopg2.extras import RealDictCursor
+from fastapi import HTTPException, status
+
+from app.utils.logger import logger
 
 def add_product(name: str, description: str, price: float, stock: int, connection):
     try:
@@ -8,8 +11,9 @@ def add_product(name: str, description: str, price: float, stock: int, connectio
         return True
     except Exception as e:
         connection.rollback()
-        raise e
-    
+        logger.error(f"Error occurred while adding product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while adding product data")
+
 def get_all_products(connection, limit, offset):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
@@ -17,8 +21,9 @@ def get_all_products(connection, limit, offset):
         products = cursor.fetchall()
         return products
     except Exception as e:
-        raise e
-    
+        logger.error(f"Error occurred while fetching products: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while fetching product data")
+
 def get_product_by_id(product_id: int, connection):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
@@ -26,8 +31,9 @@ def get_product_by_id(product_id: int, connection):
         product = cursor.fetchone()
         return product
     except Exception as e:
-        raise e
-    
+        logger.error(f"Error occurred while fetching product by ID: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while fetching product data")
+
 def update_full_product(product_id: int, name: str, description: str, price: float, stock: int, connection):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
@@ -35,9 +41,9 @@ def update_full_product(product_id: int, name: str, description: str, price: flo
         connection.commit()
         return True
     except Exception as e:
-        connection.rollback()
-        raise e
-    
+        logger.error(f"Error occurred while updating product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while updating product data")
+
 
 def update_product_stock(product_id: int, stock: int, connection):
     try:
@@ -46,9 +52,9 @@ def update_product_stock(product_id: int, stock: int, connection):
         connection.commit()
         return True
     except Exception as e:
-        connection.rollback()
-        raise e
-    
+        logger.error(f"Error occurred while updating product stock: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while updating product stock")
+
 def update_product_price(product_id: int, price: float, connection):
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
@@ -56,8 +62,8 @@ def update_product_price(product_id: int, price: float, connection):
         connection.commit()
         return True
     except Exception as e:
-        connection.rollback()
-        raise e
+        logger.error(f"Error occurred while updating product price: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while updating product price")
     
 def delete_product(product_id: int, connection):
     try:
@@ -66,5 +72,5 @@ def delete_product(product_id: int, connection):
         connection.commit()
         return True
     except Exception as e:
-        connection.rollback()
-        raise e
+        logger.error(f"Error occurred while deleting product: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while deleting product data")
