@@ -1,9 +1,8 @@
 from jose import jwt
 from datetime import datetime, timedelta
-from fastapi import HTTPException, status
 
 from app.utils.logger import logger
-
+from app.exceptions.custom_exceptions import DatabaseException, NotFoundException, AuthenticationException
 from app.config import settings
 
 SECRET_KEY = settings.SECRET_KEY
@@ -20,7 +19,7 @@ def create_access_token(data: dict):
         return encoded_jwt
     except Exception as e:
         logger.error(f"Error occurred while creating access token: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while creating access token")
+        raise DatabaseException("An error occurred while creating access token")
 
 def decode_access_token(token: str):
     try:
@@ -28,4 +27,4 @@ def decode_access_token(token: str):
         return payload
     except jwt.JWTError:
         logger.error("Invalid token")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise AuthenticationException("Invalid token")

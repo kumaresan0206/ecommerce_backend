@@ -7,7 +7,7 @@ from app.repositories.user_repository import get_user_id_by_email
 
 cart_router = APIRouter()
 
-@cart_router.post("/cart/add")
+@cart_router.post("/cart")
 @login_required
 async def add_to_cart(order: CartItem, current_user: str = Depends(get_current_user), db=Depends(get_db)):
     user_id = get_user_id_by_email(current_user.get("email"), db)

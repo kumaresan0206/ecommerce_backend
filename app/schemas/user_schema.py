@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
-class UserRegister(BaseModel):
+class UserRegisterDTO(BaseModel):
     name: str
     email: EmailStr
     password: str= Field(min_length=8)
@@ -20,6 +20,11 @@ class UserRegister(BaseModel):
 
         return v
 
-class UserLogin(BaseModel):
+class UserLoginDTO(BaseModel):
     email: EmailStr
     password: str
+
+class UserResponseDTO(BaseModel):
+    name: str
+    email: EmailStr
+    role: str

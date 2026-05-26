@@ -1,9 +1,8 @@
-from fastapi import HTTPException, status
-
-from app.repositories.user_repository import get_user_by_email, insert_user
+from app.repositories.user_repository import get_user_by_email, insert_user, get_user_details_by_email
 from app.utils.password_handler import hash_password, verify_password
 from app.utils.jwt_handler import create_access_token
 from app.utils.logger import logger
+from app.exceptions.custom_exceptions import AppException, DatabaseException, NotFoundException, AuthenticationException
 
 def register_user(user, db):
 
@@ -12,7 +11,7 @@ def register_user(user, db):
         existing_user = get_user_by_email(user.email, db)
 
         if existing_user:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+            raise AppException("User already exists")
         
         hashed = hash_password(user.password)
 
@@ -21,7 +20,7 @@ def register_user(user, db):
         return {"success": True, "message": "User registered successfully"}
     except Exception as e:
         logger.error(f"Error occurred during registration: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred during registration")
+        raise DatabaseException("An error occurred during registration")
     
 
 def login_user(user, db):
@@ -30,10 +29,10 @@ def login_user(user, db):
         existing_user = get_user_by_email(user.email, db)
 
         if not existing_user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exist")
+            raise NotFoundException("User doesn't exist")
         
         if not verify_password(user.password, existing_user["password"]):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+            raise AuthenticationException("Incorrect password")
         
         access_token = create_access_token({
             "sub": existing_user["email"],
@@ -43,4 +42,15 @@ def login_user(user, db):
         return {"success": True, "message": "User logged in successfully", "access_token": access_token}
     except Exception as e:
         logger.error(f"Error occurred during login: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred during login")
+        raise DatabaseException("An error occurred during login")
+    
+def get_current_user_info(email, db):
+    try:
+        user = get_user_details_by_email(email, db)
+        if user:
+            return {"success": True, "name": user["name"], "email": user["email"], "role": user["role"]}
+        else:
+            raise NotFoundException("User not found")
+    except Exception as e:
+        logger.error(f"Error occurred while fetching user info: {e}")
+        raise DatabaseException("An error occurred while fetching user info")

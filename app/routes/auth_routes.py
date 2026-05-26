@@ -1,29 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from app.schemas.user_schema import UserLogin, UserRegister
-from app.services.auth_service import register_user, login_user
-from app.utils.jwt_handler import decode_access_token
+from fastapi import APIRouter, Depends
+from app.schemas.user_schema import UserLoginDTO, UserRegisterDTO, UserResponseDTO
+from app.services.auth_service import register_user, login_user, get_current_user_info
+from app.middleware.auth_middleware import get_current_user
 from app.database import get_db
 from app.middleware.auth_middleware import oauth2_scheme
 
 auth_router = APIRouter()
 
 @auth_router.post("/auth/register")
-async def register(user: UserRegister, db=Depends(get_db)):
+async def register(user: UserRegisterDTO, db=Depends(get_db)):
     return register_user(user, db)
 
 @auth_router.post("/auth/login")
-async def login(user: UserLogin, db=Depends(get_db)):
+async def login(user: UserLoginDTO, db=Depends(get_db)):
     return  login_user(user, db)
 
-@auth_router.get("/auth/me")
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    payload = decode_access_token(token)
-
-    if not payload or not payload.get("sub") or not payload.get("role"):
-        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    
-    email = payload.get("sub")
-    role = payload.get("role")
-
-    return {"email": email, "role": role}
+@auth_router.get("/auth/me", response_model=UserResponseDTO)
+async def get_user_detail(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
+    current_user = get_current_user(token)
+    return get_current_user_info(current_user["email"], db)

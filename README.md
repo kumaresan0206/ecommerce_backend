@@ -203,7 +203,7 @@ Authorization: Bearer eyJhbGciOi...
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/products/add` | Create product (Admin) |
+| POST | `/products` | Create product (Admin) |
 | GET | `/products` | Get all products |
 | GET | `/products/{product_id}` | Get product by ID |
 | PUT | `/products/{product_id}` | Update product |
@@ -217,7 +217,7 @@ Authorization: Bearer eyJhbGciOi...
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/orders/me` | Create order |
-| GET | `/orders/user/me` | Get user orders |
+| GET | `/orders/me` | Get user orders |
 | GET | `/orders/{order_id}` | Get order details |
 | PATCH | `/orders/{order_id}` | Update address |
 | DELETE | `/orders/{order_id}` | Delete order |
@@ -228,7 +228,7 @@ Authorization: Bearer eyJhbGciOi...
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/cart/add` | Add to cart |
+| POST | `/cart` | Add to cart |
 | GET | `/cart` | Get cart items |
 | DELETE | `/cart/{order_id}` | Remove cart item |
 
@@ -274,9 +274,7 @@ Services
 Repositories
   ↓
 Database
-```
-
-This improves:
+```This improves:
 - scalability
 - maintainability
 - code organization

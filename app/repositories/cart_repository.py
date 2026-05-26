@@ -1,7 +1,7 @@
-from fastapi import HTTPException, status
 from psycopg2.extras import RealDictCursor
 
 from app.utils.logger import logger
+from app.exceptions.custom_exceptions import DatabaseException
 
 def add_to_cart(user_id: int, product_id: int, quantity: int, connection):
     try:
@@ -12,7 +12,7 @@ def add_to_cart(user_id: int, product_id: int, quantity: int, connection):
     except Exception as e:
         connection.rollback()
         logger.error(f"Error occurred while adding to cart: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while adding to cart")
+        raise DatabaseException("An error occurred while adding to cart")
 
 def get_cart_items_by_user_id(user_id: int, connection):
     try:
@@ -23,7 +23,7 @@ def get_cart_items_by_user_id(user_id: int, connection):
     except Exception as e:
         connection.rollback()
         logger.error(f"Error occurred while fetching cart items: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while fetching cart items")
+        raise DatabaseException("An error occurred while fetching cart items")
 
 def delete_cart_item(cart_id: int, connection):
     try:
@@ -34,4 +34,4 @@ def delete_cart_item(cart_id: int, connection):
     except Exception as e:
         connection.rollback()
         logger.error(f"Error occurred while deleting cart item: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while deleting cart item")
+        raise DatabaseException("An error occurred while deleting cart item")

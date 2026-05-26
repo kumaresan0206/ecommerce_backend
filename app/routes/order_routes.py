@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.middleware.auth_middleware import get_admin, login_required, get_current_user
-from app.schemas.order_schema import OrderDTO
+from app.schemas.order_schema import OrderDTO, ResponseOrderDTO
 from app.services.order_service import (get_user_orders, 
                                         get_order, 
                                         get_all_orders_service, 
@@ -24,12 +24,12 @@ async def create_user_order(order: OrderDTO, current_user: dict = Depends(get_cu
     order.user_id = user_id
     return create_new_order(order, db)
 
-@order_router.get("/orders/{order_id}")
+@order_router.get("/orders/{order_id}", response_model=ResponseOrderDTO)
 @login_required
 async def get_order_by_orderid(order_id: int, current_user: dict = Depends(get_current_user), db=Depends(get_db)):
     return get_order(order_id, db)
 
-@order_router.get("/orders/user/me")
+@order_router.get("/orders/me", response_model=list[ResponseOrderDTO])
 @login_required
 async def get_orders_by_user(current_user: dict = Depends(get_current_user), db=Depends(get_db)):
     user_id = get_user_id_by_email(current_user.get("email"), db)
