@@ -2,7 +2,7 @@ from jose import jwt
 from datetime import datetime, timedelta
 
 from app.utils.logger import logger
-from app.exceptions.custom_exceptions import DatabaseException, NotFoundException, AuthenticationException
+from app.exceptions.custom_exceptions import DatabaseException, AuthenticationException
 from app.config import settings
 
 SECRET_KEY = settings.SECRET_KEY
