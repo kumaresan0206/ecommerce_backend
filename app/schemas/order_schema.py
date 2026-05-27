@@ -7,7 +7,9 @@ class OrderDTO(BaseModel):
     address: str
 
 class ResponseOrderDTO(BaseModel):
-    user_id: int
-    product_id: int
-    quantity: int
-    address: str
+    success: bool
+    order: dict | None = None
+
+class OrderResponseMessageDTO(BaseModel):
+    success: bool
+    message: str

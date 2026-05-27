@@ -45,7 +45,6 @@ def get_user_details_by_email(email: str, connection):
         cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
-        
         return user if user else None
     except Exception as e:
         connection.rollback()

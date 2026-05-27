@@ -9,3 +9,11 @@ class ProductDTO(BaseModel):
 class ProductUpdateDTO(BaseModel):
     price: float = Field(gt=0, default=None)
     stock: int = Field(ge=0, default=None)
+
+class SuccessResponseDTO(BaseModel):
+    success: bool
+    message: str = None
+
+class ProductResponseDTO(BaseModel):
+    success: bool
+    product: ProductDTO = None

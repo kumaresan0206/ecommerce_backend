@@ -28,3 +28,8 @@ class UserResponseDTO(BaseModel):
     name: str
     email: EmailStr
     role: str
+
+class LoginResponseDTO(BaseModel):
+    success: bool
+    message: str
+    access_token: str

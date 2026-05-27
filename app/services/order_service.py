@@ -6,17 +6,21 @@ from app.repositories.order_repository import (get_orders_by_user_id,
                                             update_order)
 from app.utils.logger import logger
 from app.exceptions.custom_exceptions import DatabaseException, NotFoundException
+from app.repositories.user_repository import get_user_id_by_email
 
-def create_new_order(order, db):
+def create_new_order(current_user, order, db):
     try:
+        user_id = get_user_id_by_email(current_user.get("email"), db)
+        order.user_id = user_id
         place_order(order.user_id, order.product_id, order.quantity, order.address, db)
         return {"success": True, "message": "Order placed successfully"}
     except Exception as e:
         logger.error(f"Error occurred while placing order: {e}")
         raise DatabaseException("An error occurred while placing order")
 
-def get_user_orders(user_id, db):
+def get_user_orders(current_user, db):
     try:
+        user_id = get_user_id_by_email(current_user.get("email"), db)
         orders = get_orders_by_user_id(user_id, db)
         return {"success": True, "orders": orders}
     except Exception as e:

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.schemas.product_schema import ProductDTO, ProductUpdateDTO
+from app.schemas.product_schema import ProductDTO, ProductUpdateDTO, SuccessResponseDTO, ProductResponseDTO
 from app.services.product_service import get_products, get_product, create_product, update_product, update_full_product_info, delete_product_by_id
 from app.database import get_db
 from app.middleware.auth_middleware import get_admin
@@ -14,15 +14,15 @@ async def add_product(product: ProductDTO, token: str = Depends(get_admin), db=D
     
     return create_product(product, db)
 
-@product_router.get("/products", response_model=list[ProductDTO])
+@product_router.get("/products", response_model=list[ProductResponseDTO])
 async def show_all_products(db=Depends(get_db), limit: int = 10, offset: int = 0):
     return get_products(db, limit, offset)
 
-@product_router.get("/products/{product_id}")
+@product_router.get("/products/{product_id}", response_model=ProductResponseDTO)
 async def show_product(product_id: int, db=Depends(get_db)):
     return get_product(product_id, db)
 
-@product_router.put("/products/{product_id}")
+@product_router.put("/products/{product_id}", response_model=SuccessResponseDTO)
 async def update_product_info(product_id: int, product: ProductUpdateDTO, token: str = Depends(get_admin), db=Depends(get_db)):
     
     if isinstance(token, dict) and not token.get("success", True):
@@ -30,7 +30,7 @@ async def update_product_info(product_id: int, product: ProductUpdateDTO, token:
     
     return update_product(product_id, product, db)
 
-@product_router.delete("/products/{product_id}")
+@product_router.delete("/products/{product_id}", response_model=SuccessResponseDTO)
 async def delete_product(product_id: int, token: str = Depends(get_admin), db=Depends(get_db)):
     
     if isinstance(token, dict) and not token.get("success", True):
@@ -38,7 +38,7 @@ async def delete_product(product_id: int, token: str = Depends(get_admin), db=De
     
     return delete_product_by_id(product_id, db)
 
-@product_router.patch("/products/{product_id}")
+@product_router.patch("/products/{product_id}", response_model=SuccessResponseDTO)
 async def update_product_price_or_stock(product_id: int, product: ProductUpdateDTO, token: str = Depends(get_admin), db=Depends(get_db)):
     
     if isinstance(token, dict) and not token.get("success", True):
@@ -46,7 +46,7 @@ async def update_product_price_or_stock(product_id: int, product: ProductUpdateD
     
     return update_product(product_id, product, db)
 
-@product_router.put("/products/{product_id}")
+@product_router.put("/products/{product_id}", response_model=SuccessResponseDTO)
 async def update_full_product(product_id: int, product: ProductDTO, token: str = Depends(get_admin), db=Depends(get_db)):
     
     if isinstance(token, dict) and not token.get("success", True):
